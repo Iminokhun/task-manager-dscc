@@ -1,0 +1,57 @@
+services:
+  db:
+    image: postgres:15-alpine
+    container_name: cloud_db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: cloud_db
+      POSTGRES_USER: cloud_user
+      POSTGRES_PASSWORD: cloud_pass_123
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U cloud_user -d cloud_db"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: cloud_web
+    restart: unless-stopped
+    environment:
+      DEBUG: "False"
+      SECRET_KEY: django-insecure-change-this-in-production
+      ALLOWED_HOSTS: "localhost,127.0.0.1"
+      CSRF_TRUSTED_ORIGINS: "http://localhost,http://127.0.0.1"
+      DB_NAME: cloud_db
+      DB_USER: cloud_user
+      DB_PASSWORD: cloud_pass_123
+      DB_HOST: db
+      DB_PORT: "5432"
+    depends_on:
+      db:
+        condition: service_healthy
+    volumes:
+      - static_volume:/app/staticfiles
+      - media_volume:/app/media
+
+  nginx:
+    image: nginx:1.27-alpine
+    container_name: cloud_nginx
+    restart: unless-stopped
+    depends_on:
+      - web
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/conf.d/default.conf:ro
+      - static_volume:/app/staticfiles:ro
+      - media_volume:/app/media:ro
+
+volumes:
+  postgres_data:
+  static_volume:
+  media_volume:
