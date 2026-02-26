@@ -1,20 +1,26 @@
 {% extends "base.html" %}
 {% block content %}
-<h2>{{ task.title }}</h2>
-<p>{{ task.description }}</p>
-<p>Status: {{ task.status }}</p>
-<p>Project: {{ task.project.name }}</p>
-<p>Assignee: {{ task.assignee|default:"-" }}</p>
-<p>Due date: {{ task.due_date|default:"-" }}</p>
-<p>Tags:
-  {% for tag in task.tags.all %}
-    {{ tag.name }}{% if not forloop.last %}, {% endif %}
-  {% empty %}
-    -
-  {% endfor %}
-</p>
-<p>
-  <a href="/tasks/{{ task.id }}/edit/">Edit</a> |
-  <a href="/tasks/{{ task.id }}/delete/">Delete</a>
-</p>
+<div class="card border-0 shadow-sm">
+  <div class="card-body">
+    <div class="d-flex justify-content-between align-items-start mb-3">
+      <h2 class="h4 mb-0">{{ task.title }}</h2>
+      <span class="badge text-bg-primary">{{ task.get_status_display }}</span>
+    </div>
+    <p class="text-muted">{{ task.description|default:"No description." }}</p>
+    <ul class="list-group list-group-flush mb-3">
+      <li class="list-group-item px-0"><strong>Project:</strong> {{ task.project.name }}</li>
+      <li class="list-group-item px-0"><strong>Assignee:</strong> {{ task.assignee|default:"-" }}</li>
+      <li class="list-group-item px-0"><strong>Due date:</strong> {{ task.due_date|default:"-" }}</li>
+      <li class="list-group-item px-0"><strong>Tags:</strong>
+        {% for tag in task.tags.all %}
+          <span class="badge text-bg-secondary">{{ tag.name }}</span>
+        {% empty %}
+          -
+        {% endfor %}
+      </li>
+    </ul>
+    <a class="btn btn-outline-secondary" href="{% url 'task_update' task.id %}">Edit</a>
+    <a class="btn btn-outline-danger" href="{% url 'task_delete' task.id %}">Delete</a>
+  </div>
+</div>
 {% endblock %}

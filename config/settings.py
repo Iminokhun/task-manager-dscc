@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/6.0/ref/settings/
 
 from pathlib import Path
 import os
+from importlib.util import find_spec
 from dotenv import load_dotenv
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -42,6 +43,9 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'tasks',
 ]
+
+if find_spec("crispy_forms"):
+    INSTALLED_APPS += ["crispy_forms", "crispy_bootstrap5"]
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -89,16 +93,24 @@ DATABASES = {
 
 REDIS_URL = os.getenv("REDIS_URL", "redis://127.0.0.1:6379/1")
 
-CACHES = {
-    "default": {
-        "BACKEND": "django_redis.cache.RedisCache",
-        "LOCATION": REDIS_URL,
-        "OPTIONS": {
-            "CLIENT_CLASS": "django_redis.client.DefaultClient",
-        },
-        "KEY_PREFIX": "cloud",
+if find_spec("django_redis"):
+    CACHES = {
+        "default": {
+            "BACKEND": "django_redis.cache.RedisCache",
+            "LOCATION": REDIS_URL,
+            "OPTIONS": {
+                "CLIENT_CLASS": "django_redis.client.DefaultClient",
+            },
+            "KEY_PREFIX": "cloud",
+        }
     }
-}
+else:
+    CACHES = {
+        "default": {
+            "BACKEND": "django.core.cache.backends.locmem.LocMemCache",
+            "LOCATION": "cloud-local-cache",
+        }
+    }
 
 SESSION_ENGINE = "django.contrib.sessions.backends.cache"
 SESSION_CACHE_ALIAS = "default"
@@ -151,3 +163,6 @@ CSRF_TRUSTED_ORIGINS = [
 
 LOGIN_REDIRECT_URL = "/"
 LOGOUT_REDIRECT_URL = "/login/"
+
+CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap5"
+CRISPY_TEMPLATE_PACK = "bootstrap5"
