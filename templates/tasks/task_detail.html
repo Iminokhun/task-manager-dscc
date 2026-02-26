@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>{{ task.title }}</h2>
+<p>{{ task.description }}</p>
+<p>Status: {{ task.status }}</p>
+<p>Project: {{ task.project.name }}</p>
+<p>Assignee: {{ task.assignee|default:"-" }}</p>
+<p>Due date: {{ task.due_date|default:"-" }}</p>
+<p>Tags:
+  {% for tag in task.tags.all %}
+    {{ tag.name }}{% if not forloop.last %}, {% endif %}
+  {% empty %}
+    -
+  {% endfor %}
+</p>
+<p>
+  <a href="/tasks/{{ task.id }}/edit/">Edit</a> |
+  <a href="/tasks/{{ task.id }}/delete/">Delete</a>
+</p>
+{% endblock %}
