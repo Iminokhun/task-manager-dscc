@@ -1,0 +1,25 @@
+<div class="card shadow-sm border-0 border-start border-4 {{ border_color }} mb-3 rounded-3">
+  <div class="card-body p-3">
+    <div class="d-flex justify-content-between align-items-start mb-2">
+      <small class="text-muted fw-bold">{{ task.project.name }}</small>
+      <div class="dropdown">
+        <button class="btn btn-sm p-0" type="button" data-bs-toggle="dropdown">...</button>
+        <ul class="dropdown-menu">
+          <li><a class="dropdown-item" href="{% url 'task_update' task.id %}">Edit</a></li>
+          <li><hr class="dropdown-divider"></li>
+          <li><a class="dropdown-item text-danger" href="{% url 'task_delete' task.id %}">Delete</a></li>
+        </ul>
+      </div>
+    </div>
+
+    <h6 class="card-title fw-bold mb-3">{{ task.title }}</h6>
+
+    <div class="d-flex justify-content-between align-items-center">
+      <div class="user-avatar shadow-sm" title="{{ task.assignee|default:'Unassigned' }}"
+           style="width: 24px; height: 24px; background: #ddd; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 10px;">
+        {{ task.assignee.username|default:"?"|slice:":1"|upper }}
+      </div>
+      <a href="{% url 'task_detail' task.id %}" class="btn btn-outline-dark btn-sm px-3 rounded-pill" style="font-size: 0.7rem;">View</a>
+    </div>
+  </div>
+</div>
