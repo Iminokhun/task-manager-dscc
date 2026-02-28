@@ -28,7 +28,9 @@ def register_view(request):
 
 @login_required
 def task_list(request):
-    base_qs = Task.objects.select_related("project", "assignee").prefetch_related("tags")
+    base_qs = Task.objects.select_related("project", "assignee").prefetch_related(
+        "tags"
+    )
     context = {
         "todo_tasks": base_qs.filter(status="todo"),
         "ip_tasks": base_qs.filter(status="in_progress"),
@@ -40,7 +42,9 @@ def task_list(request):
 @login_required
 def task_detail(request, pk):
     task = get_object_or_404(
-        Task.objects.select_related("project", "assignee").prefetch_related("tags", "comments__author"),
+        Task.objects.select_related("project", "assignee").prefetch_related(
+            "tags", "comments__author"
+        ),
         pk=pk,
     )
     if request.method == "POST":
@@ -53,7 +57,9 @@ def task_detail(request, pk):
             return redirect("task_detail", pk=task.pk)
     else:
         form = CommentForm()
-    return render(request, "tasks/task_detail.html", {"task": task, "comment_form": form})
+    return render(
+        request, "tasks/task_detail.html", {"task": task, "comment_form": form}
+    )
 
 
 @login_required
@@ -65,7 +71,9 @@ def task_create(request):
             return redirect("task_list")
     else:
         form = TaskForm()
-    return render(request, "tasks/task_form.html", {"form": form, "title": "Create Task"})
+    return render(
+        request, "tasks/task_form.html", {"form": form, "title": "Create Task"}
+    )
 
 
 @login_required

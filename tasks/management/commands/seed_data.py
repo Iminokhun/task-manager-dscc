@@ -52,7 +52,9 @@ class Command(BaseCommand):
 
         users = {}
         for username, email, is_staff, is_superuser in users_data:
-            user, _ = User.objects.get_or_create(username=username, defaults={"email": email})
+            user, _ = User.objects.get_or_create(
+                username=username, defaults={"email": email}
+            )
             user.email = email
             user.is_active = True
             user.is_staff = is_staff
@@ -192,7 +194,15 @@ class Command(BaseCommand):
         ]
 
         tasks = {}
-        for title, description, status, due_date, project_name, assignee_name, tag_names in task_specs:
+        for (
+            title,
+            description,
+            status,
+            due_date,
+            project_name,
+            assignee_name,
+            tag_names,
+        ) in task_specs:
             task, _ = Task.objects.get_or_create(
                 title=title,
                 defaults={
@@ -216,12 +226,36 @@ class Command(BaseCommand):
     def _seed_comments(self, users, tasks):
         comments_specs = [
             ("Design landing page hero", "manager1", "Please keep CTA above the fold."),
-            ("Design landing page hero", "dev1", "Initial draft is done, needs review."),
-            ("Fix login redirect bug", "qa1", "Reproducible on both Chrome and Firefox."),
-            ("Set up CI pipeline", "manager2", "Make sure deployment runs only on main."),
-            ("Set up CI pipeline", "dev1", "Lint and tests are already passing locally."),
-            ("Write API test scenarios", "qa1", "I will add edge cases for invalid tokens."),
-            ("Create deployment checklist", "manager2", "Add rollback steps before release."),
+            (
+                "Design landing page hero",
+                "dev1",
+                "Initial draft is done, needs review.",
+            ),
+            (
+                "Fix login redirect bug",
+                "qa1",
+                "Reproducible on both Chrome and Firefox.",
+            ),
+            (
+                "Set up CI pipeline",
+                "manager2",
+                "Make sure deployment runs only on main.",
+            ),
+            (
+                "Set up CI pipeline",
+                "dev1",
+                "Lint and tests are already passing locally.",
+            ),
+            (
+                "Write API test scenarios",
+                "qa1",
+                "I will add edge cases for invalid tokens.",
+            ),
+            (
+                "Create deployment checklist",
+                "manager2",
+                "Add rollback steps before release.",
+            ),
         ]
 
         created_or_updated = 0

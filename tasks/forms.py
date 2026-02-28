@@ -16,7 +16,15 @@ class RegisterForm(UserCreationForm):
 class TaskForm(forms.ModelForm):
     class Meta:
         model = Task
-        fields = ("title", "description", "status", "due_date", "project", "assignee", "tags")
+        fields = (
+            "title",
+            "description",
+            "status",
+            "due_date",
+            "project",
+            "assignee",
+            "tags",
+        )
 
 
 class CommentForm(forms.ModelForm):
