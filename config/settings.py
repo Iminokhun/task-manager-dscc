@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/6.0/ref/settings/
 
 from pathlib import Path
 import os
+import sys
 from importlib.util import find_spec
 from dotenv import load_dotenv
 
@@ -28,6 +29,7 @@ SECRET_KEY = os.getenv("SECRET_KEY", "django-insecure-dev-key-change-me")
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.getenv("DEBUG", "True") == "True"
+TESTING = os.getenv("TESTING", "False") == "True" or "pytest" in sys.modules
 
 ALLOWED_HOSTS = [
     h.strip()
@@ -84,20 +86,35 @@ WSGI_APPLICATION = "config.wsgi.application"
 # Database
 # https://docs.djangoproject.com/en/6.0/ref/settings/#databases
 
-DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.postgresql",
-        "NAME": os.getenv("DB_NAME", "cloud_db"),
-        "USER": os.getenv("DB_USER", "cloud_user"),
-        "PASSWORD": os.getenv("DB_PASSWORD", "cloud_pass_123"),
-        "HOST": os.getenv("DB_HOST", "127.0.0.1"),
-        "PORT": os.getenv("DB_PORT", "5432"),
+if TESTING:
+    DATABASES = {
+        "default": {
+            "ENGINE": "django.db.backends.sqlite3",
+            "NAME": BASE_DIR / "test_db.sqlite3",
+        }
     }
-}
+else:
+    DATABASES = {
+        "default": {
+            "ENGINE": "django.db.backends.postgresql",
+            "NAME": os.getenv("DB_NAME", "cloud_db"),
+            "USER": os.getenv("DB_USER", "cloud_user"),
+            "PASSWORD": os.getenv("DB_PASSWORD", "cloud_pass_123"),
+            "HOST": os.getenv("DB_HOST", "127.0.0.1"),
+            "PORT": os.getenv("DB_PORT", "5432"),
+        }
+    }
 
 REDIS_URL = os.getenv("REDIS_URL", "redis://127.0.0.1:6379/1")
 
-if find_spec("django_redis"):
+if TESTING:
+    CACHES = {
+        "default": {
+            "BACKEND": "django.core.cache.backends.locmem.LocMemCache",
+            "LOCATION": "test-cache",
+        }
+    }
+elif find_spec("django_redis"):
     CACHES = {
         "default": {
             "BACKEND": "django_redis.cache.RedisCache",
@@ -116,7 +133,11 @@ else:
         }
     }
 
-SESSION_ENGINE = "django.contrib.sessions.backends.cache"
+SESSION_ENGINE = (
+    "django.contrib.sessions.backends.db"
+    if TESTING
+    else "django.contrib.sessions.backends.cache"
+)
 SESSION_CACHE_ALIAS = "default"
 
 
