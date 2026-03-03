@@ -1,0 +1,4 @@
+services:
+  web:
+    image: student13174/cloud-web:a55fdc6943554e7e566c05b2fd63113302ac0dcd
+    build: null
