@@ -27,16 +27,23 @@ A production-ready Task Manager built with Django and PostgreSQL, containerized 
 ## Project Structure
 
 ```text
-config/                     # Django project settings/urls
-tasks/                      # Main app (models, views, forms, tests)
-templates/                  # HTML templates
-docker/entrypoint.sh        # App startup script
-nginx/nginx.conf            # Nginx config
-docker-compose.yml          # Production stack
-docker-compose.dev.yml      # Development stack
+config/                      # Django project settings/urls
+tasks/                       # Main app (models, views, forms, tests)
+templates/                   # HTML templates
+docker/entrypoint.sh         # App startup script
+nginx/nginx.conf             # Nginx config
+docker-compose.yml           # Production stack
+docker-compose.dev.yml       # Development stack
+docker-compose.deploy.override.yml # Deploy overrides (if used)
 .github/workflows/deploy.yml # CI/CD workflow
-scripts/deploy.sh           # Remote deploy script
+scripts/deploy.sh            # Remote deploy script
 ```
+
+## Live Links
+
+- Live Application: `https://qoyilmaqom.uz`
+- GitHub Repository: `https://github.com/Iminokhun/task-manager-dscc`
+- Docker Hub Repository: `https://hub.docker.com/r/student13174/cloud-web`
 
 ## Setup
 
@@ -53,13 +60,16 @@ python -m venv .venv
 pip install -r requirements.txt
 ```
 
-3. Configure `.env` in project root.
+3. Configure `.env` in project root (see `.env.example`).
 
 4. Run migrations and start server:
 ```powershell
 python manage.py migrate
 python manage.py runserver
 ```
+
+App URL:
+- `http://127.0.0.1:8000/`
 
 ### 2. Development (Docker)
 
@@ -91,31 +101,66 @@ docker compose down
 ```
 
 App URL:
-- `http://127.0.0.1/`
+- `https://qoyilmaqom.uz`
+
+## Test Access
+
+Use these credentials for assessor testing:
+
+- Username: `appuser`
+- Password: `<set-on-server>`
+
+Admin panel:
+- URL: `/admin/`
+- Admin user: `<your-admin-username>`
 
 ## Environment Variables
 
-Create `.env` file in project root:
+Create `.env` file in project root using `.env.example` template.
+
+Example template values:
 
 ```env
 DEBUG=False
 TESTING=False
-SECRET_KEY=replace_with_strong_secret
-ALLOWED_HOSTS=127.0.0.1,localhost
-CSRF_TRUSTED_ORIGINS=http://127.0.0.1,http://localhost
+SECRET_KEY=CHANGE_ME
+ALLOWED_HOSTS=CHANGE_ME
+CSRF_TRUSTED_ORIGINS=CHANGE_ME
+
+DB_NAME=CHANGE_ME
+DB_USER=CHANGE_ME
+DB_PASSWORD=CHANGE_ME
+DB_HOST=CHANGE_ME
+DB_PORT=CHANGE_ME
+
+REDIS_URL=CHANGE_ME
+```
+
+Notes:
+- Do not commit `.env`.
+- Use a strong random `SECRET_KEY` in production.
+- Add server IP/domain to `ALLOWED_HOSTS` and `CSRF_TRUSTED_ORIGINS`.
+
+## Production Environment Notes
+
+Production uses environment variables from `.env` on server (`~/cloud/.env`).
+
+Required production values:
+
+```env
+DEBUG=False
+SECRET_KEY=CHANGE_ME
+ALLOWED_HOSTS=qoyilmaqom.uz,localhost,127.0.0.1
+CSRF_TRUSTED_ORIGINS=https://qoyilmaqom.uz
 
 DB_NAME=cloud_db
 DB_USER=cloud_user
-DB_PASSWORD=cloud_pass_123
+DB_PASSWORD=CHANGE_ME
 DB_HOST=db
 DB_PORT=5432
 
 REDIS_URL=redis://redis:6379/1
 ```
-
-Notes:
-- Use strong `SECRET_KEY` in production.
-- Add server IP/domain to `ALLOWED_HOSTS` and `CSRF_TRUSTED_ORIGINS`.
 
 ## Database Seed
 
@@ -181,11 +226,12 @@ Pipeline steps:
 2. Run `black --check .`
 3. Run `pytest`
 4. Build Docker image
-5. Push image to Docker Hub (`latest` + commit SHA tag)
-6. SSH deploy to server
-7. Run migrations
-8. Collect static files
-9. Restart services
+5. Tag image (`latest` + commit SHA)
+6. Push image to Docker Hub
+7. Deploy to server via SSH (`scripts/deploy.sh`)
+8. Run migrations automatically
+9. Collect static files
+10. Restart services
 
 Required GitHub Secrets:
 - `DOCKERHUB_USERNAME`

@@ -32,7 +32,6 @@ services:
     env_file:
       - .env
     environment:
-<<<<<<< HEAD
       DEBUG: ${DEBUG:-False}
       SECRET_KEY: ${SECRET_KEY}
       ALLOWED_HOSTS: ${ALLOWED_HOSTS}
