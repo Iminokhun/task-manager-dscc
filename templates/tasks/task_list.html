@@ -11,7 +11,7 @@
       <div class="p-3 rounded-3" style="background-color: #ebedf0;">
         <h6 class="fw-bold text-uppercase mb-3 d-flex justify-content-between">
           <span>To Do</span>
-          <span class="badge bg-secondary rounded-pill">{{ todo_tasks.count }}</span>
+          <!-- <span class="badge bg-secondary rounded-pill">{{ todo_tasks.count }}</span> -->
         </h6>
         {% for task in todo_tasks %}
           {% include "includes/task_card.html" with task=task border_color="border-secondary" %}
